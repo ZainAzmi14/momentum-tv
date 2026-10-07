@@ -1,97 +1,60 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Momentum TV
 
-# Getting Started
+Momentum TV is a React Native CLI app for Android TV and Fire TV, built with
+the `react-native-tvos` fork. It uses the Momentum API for dashboard content.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Requirements
 
-## Step 1: Start Metro
+- Node.js 22 (`nvm use`)
+- JDK 17
+- Android SDK Platform 35 and Build Tools 35.0.0
+- An Android TV/Fire TV device or emulator
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
-
-To start the Metro dev server, run the following command from the root of your React Native project:
+## Install and run
 
 ```sh
-# Using npm
+npm ci
 npm start
-
-# OR using Yarn
-yarn start
 ```
 
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
+In another terminal, start the Android TV app:
 
 ```sh
-# Using npm
 npm run android
-
-# OR using Yarn
-yarn android
 ```
 
-### iOS
+The app requires Leanback and can be launched from the TV launcher. Android
+debug builds allow HTTP for local API development; release builds do not.
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+## API setup
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+The Android emulator reaches the host machine at `10.0.2.2`. Set `API_PORT`
+and `DASHBOARD_PATH` in `src/api/config.ts` to match the local Momentum API.
+Replace the production URL in that file before creating a release build. On a
+physical TV device, use an API hostname/IP reachable from that device instead
+of the emulator-only `10.0.2.2` address.
+
+Generate API types directly from the Momentum API OpenAPI document:
 
 ```sh
-bundle install
+MOMENTUM_API_SPEC_URL=http://localhost:5000/swagger/v1/swagger.json npm run api:generate
 ```
 
-Then, and every time you update your native dependencies, run:
+The default spec URL uses port 5000. Generated types are written to
+`src/api/generated/api.d.ts`; do not hand-edit files in that directory.
+
+The dashboard currently expects a JSON array or an object with an `items`
+array. Items can contain `id`, `title`/`name`, `description`/`summary`, and
+`imageUrl` (or `image`/`thumbnail`). Confirm the endpoint and response fields
+against the API's Swagger document before deploying.
+
+## Checks
 
 ```sh
-bundle exec pod install
+npm run lint
+npm run typecheck
+npm test
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+The Device diagnostics screen reports device model, OS version, total RAM,
+network connectivity, and screen resolution.
